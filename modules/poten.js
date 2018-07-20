@@ -9,7 +9,7 @@ var Poten = function(pin, opts){
     high: [],
     low: []
   };
-  setInterval(this.check.bind(this), 1000); 
+  var id = setInterval(this.check.bind(this), 2000); 
 };
 
 Poten.prototype.subscribe = function(event, cb) {
