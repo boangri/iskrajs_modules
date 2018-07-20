@@ -1,39 +1,44 @@
-var red = require('poten').connect(A1, {
+/*
+btn - A0
+poten - A1
+red led - P8
+blue blinking led - P9
+*/
+
+var poten = require('poten').connect(A1, {
   low: 0.5,
   high: 0.6
 });
-var blue = require('poten').connect(A1, {
-  low: 0.2,
-  high: 0.3
-});
 var btn = require('button').connect(A0);
+bled = require('blinking-led').connect(P9, {
+  period: 100
+});
 
 btn.on('press', function(){
-  console.log('Current: '+red.readout());
+  console.log('Current: '+poten.readout());
 });
 
-if (red.readout() > 0.6) P8.write(true);
+if (poten.readout() > 0.6) {
+  P8.write(true);
+  bled.write(true);
+}
 
-red.subscribe('high', function(e){
+poten.subscribe('high', function(e){
   console.log('High mark reached: '+e.temp);
   P8.write(true);
 });
 
-red.subscribe('low', function(e){
+poten.subscribe('low', function(e){
   console.log('Low mark reached: '+e.temp);
   P8.write(false);
 });
 
-if (blue.readout() < 0.2) P9.write(true);
-
-blue.subscribe('high', function(e){
-  console.log('Stop heating: '+e.temp);
-  P9.write(false);
+poten.subscribe('high', function(e){
+  bled.write(true);
 });
 
-blue.subscribe('low', function(e){
-  console.log('Start heating: '+e.temp);
-  P9.write(true);
+poten.subscribe('low', function(e){
+  bled.write(false);
 });
 
 
