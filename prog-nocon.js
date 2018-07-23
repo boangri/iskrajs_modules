@@ -11,13 +11,9 @@ var level = require('level').connect(poten, {
   high: 0.6,
   accuracy: 0.05
 });
-var btn = require('button').connect(A0);
+
 bled = require('blinking-led').connect(P9, {
   period: 100
-});
-
-btn.on('press', function(){
-  console.log('Current: '+level.readout());
 });
 
 if (level.readout() > 0.6) {
@@ -33,10 +29,6 @@ level.on('high', function(e){
 level.on('low', function(e){
   //console.log('Low mark reached: '+e.temp);
   P8.write(false);
-});
-
-level.on('change', function(e){
-    console.log(e.temp);
 });
 
 level.on('high', function(e){

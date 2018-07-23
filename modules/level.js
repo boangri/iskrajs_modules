@@ -1,18 +1,18 @@
 var Level = function(pin, opts){
   this._pin = pin;
   opts = opts || {};
-  this._pin.mode('analog');
   this._state = this._pin.readout();
   this._prev_state = this._state;
   this._high = opts.high ? opts.high : 0.9;
   this._low = opts.low ? opts.low : 0.1;
   this._accuracy = opts.accuracy ? opts.accuracy : 0.1;
+  this._period = opts.period ? opts.period : 100;
   this._observers = {
     high: [],
     low: [],
     change: []
   };
-  var id = setInterval(this.check.bind(this), 2000); 
+  var id = setInterval(this.check.bind(this), this._period); 
 };
 
 Level.prototype.on = function(event, cb) {
@@ -36,10 +36,10 @@ Level.prototype.emit = function(event) {
       observers = this._observers.high;
       break;
     case 'low':
-      observers = this._observers.high;
+      observers = this._observers.low;
       break;
     case 'change':
-      observers = this._observers.high;
+      observers = this._observers.change;
       break;
   };
   observers.map(function(cb){
