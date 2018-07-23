@@ -1,13 +1,15 @@
 /*
 btn - A0
-poten - A1
+potenciometer - A1
 red led - P8
 blue blinking led - P9
 */
+var poten = require('poten').connect(A1);
 
-var poten = require('poten').connect(A1, {
+var level = require('level').connect(poten, {
   low: 0.5,
-  high: 0.6
+  high: 0.6,
+  accuracy: 0.05
 });
 var btn = require('button').connect(A0);
 bled = require('blinking-led').connect(P9, {
@@ -15,29 +17,33 @@ bled = require('blinking-led').connect(P9, {
 });
 
 btn.on('press', function(){
-  console.log('Current: '+poten.readout());
+  console.log('Current: '+level.readout());
 });
 
-if (poten.readout() > 0.6) {
+if (level.readout() > 0.6) {
   P8.write(true);
   bled.write(true);
 }
 
-poten.subscribe('high', function(e){
+level.on('high', function(e){
   console.log('High mark reached: '+e.temp);
   P8.write(true);
 });
 
-poten.subscribe('low', function(e){
+level.on('low', function(e){
   console.log('Low mark reached: '+e.temp);
   P8.write(false);
 });
 
-poten.subscribe('high', function(e){
+level.on('change', function(e){
+    console.log(e.temp);
+});
+
+level.on('high', function(e){
   bled.write(true);
 });
 
-poten.subscribe('low', function(e){
+level.on('low', function(e){
   bled.write(false);
 });
 

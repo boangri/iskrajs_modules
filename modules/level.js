@@ -6,6 +6,7 @@ var Level = function(pin, opts){
   this._prev_state = this._state;
   this._high = opts.high ? opts.high : 0.9;
   this._low = opts.low ? opts.low : 0.1;
+  this._accuracy = opts.accuracy ? opts.accuracy : 0.1;
   this._observers = {
     high: [],
     low: [],
@@ -14,28 +15,38 @@ var Level = function(pin, opts){
   var id = setInterval(this.check.bind(this), 2000); 
 };
 
-Level.prototype.subscribe = function(event, cb) {
-  if (event === 'high')
-    this._observers.high.push(cb);
-  if (event === 'low')
-    this._observers.low.push(cb);
+Level.prototype.on = function(event, cb) {
+  switch (event) {
+    case 'high':
+      this._observers.high.push(cb);
+      break;
+    case 'low':
+      this._observers.low.push(cb);
+      break;
+    case 'change':
+      this._observers.change.push(cb);
+      break;
+  };
 }
 
 Level.prototype.emit = function(event) {
-  if (event === 'high') {
-    this._observers.high.map(function(cb){
-      cb({ 
-        temp: this._state
-      });
-    }, this)
-  }
-  if (event === 'low') {
-    this._observers.low.map(function(cb){
-      cb({ 
-        temp: this._state
-      });
-    }, this)
-  }
+  var observers;
+  switch (event) {
+    case 'high':
+      observers = this._observers.high;
+      break;
+    case 'low':
+      observers = this._observers.high;
+      break;
+    case 'change':
+      observers = this._observers.high;
+      break;
+  };
+  observers.map(function(cb){
+    cb({
+      temp: this._state
+    });
+  }, this);
 }
 
 Level.prototype.check = function() {
@@ -47,7 +58,11 @@ Level.prototype.check = function() {
   if (this._state > this._low && temp <= this._low) {
     this._state = temp;
     this.emit('low');
-  } 
+  }
+  if (Math.abs(temp - this._prev_state) >= this._accuracy) {
+    this._prev_state = temp;
+    this.emit('change');
+  }
   this._state = temp;
 }
 
