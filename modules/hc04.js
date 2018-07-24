@@ -19,7 +19,7 @@ HC04.prototype.read = function(callback) {
     digitalPulse(this._trigger, 1, 0.01);
 };
 
-HC04.prototype.loop = function(time, units) {
+HC04.prototype.loop = function(time) {
     if(this._intID) {
         clearInterval(this._intID);
     }
@@ -33,6 +33,14 @@ HC04.prototype.loop = function(time, units) {
         });
     }, time);
 };
+
+HC04.prototype.readout = function() {
+    var self = this;
+    this.read(function(time){
+        self._distance = time*17000;
+    });
+    return this._distance;
+}
 
 exports.connect = function(opts) {
     return new HC04(opts);

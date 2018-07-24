@@ -1,10 +1,31 @@
 var hc = require('hc04').connect({
-  echo: P8,
-  trigger: P9,
+  echo: P10,
+  trigger: P11,
 });
 
-hc.on('read', function(dist) {
-  print(dist);
+var level = require('level').connect(hc, {
+  high: 20,
+  low: 5,
+  period: 1000,
+  accuracy: 1
 });
 
-hc.loop(500, 'mm');
+// hc.on('read', function(dist) {
+//   print(dist);
+// });
+
+//hc.loop(2000);
+
+// setInterval(function(){
+//   hc.read(function(time){
+//     print(time*1000000);
+//   });
+// }, 2000);
+
+// setInterval(function(){
+//   print('dist='+hc.readout());
+// }, 2000);
+
+level.on('high', function(e){
+  print ('high='+e.temp);
+});
